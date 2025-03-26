@@ -1,0 +1,213 @@
+<% layout('/layouts/boilerplate') -%>
+
+    <style>
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter {
+            text-align: center;
+            opacity: 0.7;
+            cursor: pointer;
+            margin-top: 2rem;
+            text-decoration: none !important;
+            color: #222222 !important;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .filter:hover {
+            opacity: 1;
+            color: #222222 !important;
+            text-decoration: none !important;
+        }
+
+        .filter.active {
+            opacity: 1;
+            font-weight: bold;
+            border-bottom: 2px solid #fe424d;
+            color: #222222 !important;
+        }
+
+        .filter i {
+            font-size: 1.5rem;
+            color: #222222 !important;
+            margin-bottom: 0.25rem;
+        }
+
+        .filter p {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #222222 !important;
+            margin-bottom: 0;
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+            .filters {
+                gap: 1.5rem;
+            }
+            
+            .filter i {
+                font-size: 1.2rem;
+            }
+            
+            .filter p {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Make filters wrap better on mobile */
+        @media (max-width: 576px) {
+            .filters {
+                gap: 1rem;
+            }
+            
+            .filter {
+                margin-top: 1.5rem;
+                width: 60px;
+            }
+        }
+
+        .tax-info {
+            display: none;
+        }
+
+        .tax-toggle {
+            border: 1px solid black;
+            border-radius: 1rem;
+            height: 3.2rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            margin-left: 2rem;
+        }
+
+        .no-results {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+    </style>
+
+    <div class="filters">
+        <a href="/listings" class="filter <%= !category ? 'active' : '' %>">
+            <i class="fa-solid fa-house"></i>
+            <p>All</p>
+        </a>
+        
+        <!-- Preserve search parameter in category filters if there's a search -->
+        <a href="/listings?category=Trending<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Trending' ? 'active' : '' %>">
+            <i class="fa-solid fa-fire"></i>
+            <p>Trending</p>
+        </a>
+
+        <a href="/listings?category=Rooms<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Rooms' ? 'active' : '' %>">
+            <i class="fa-solid fa-bed"></i>
+            <p>Rooms</p>
+        </a>
+
+        <a href="/listings?category=Iconic%20Cities<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Iconic Cities' ? 'active' : '' %>">
+            <i class="fa-solid fa-mountain-city"></i>
+            <p>Iconic Cities</p>
+        </a>
+
+        <a href="/listings?category=Mountains<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Mountains' ? 'active' : '' %>">
+            <i class="fa-solid fa-mountain"></i>
+            <p>Mountains</p>
+        </a>
+
+        <a href="/listings?category=Castles<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Castles' ? 'active' : '' %>">
+            <i class="fa-brands fa-fort-awesome"></i>
+            <p>Castles</p>
+        </a>
+
+        <a href="/listings?category=Amazing%20pool<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Amazing pool' ? 'active' : '' %>">
+            <i class="fa-solid fa-person-swimming"></i>
+            <p>Amazing pool</p>
+        </a>
+
+        <a href="/listings?category=Farms<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Farms' ? 'active' : '' %>">
+            <i class="fa-solid fa-cow"></i>
+            <p>Farms</p>
+        </a>
+
+        <a href="/listings?category=Arctic<%= search ? '&search=' + search : '' %>" class="filter <%= category === 'Arctic' ? 'active' : '' %>">
+            <i class="fa-solid fa-snowflake"></i>
+            <p>Arctic</p>
+        </a>
+
+        <div class="tax-toggle">
+            <div class="form-check-reverse form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3" id="listings-container">
+        <% if (allListings.length === 0) { %>
+            <div class="col-12">
+                <div class="no-results">
+                    <h3>No listings found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
+                </div>
+            </div>
+        <% } else { %>
+            <% for (let listing of allListings) { %>
+                <a href="/listings/<%= listing._id %>" class="listing-link listing-item" 
+                   data-title="<%= listing.title.toLowerCase() %>" 
+                   data-location="<%= listing.location.toLowerCase() %>"
+                   data-country="<%= listing.country.toLowerCase() %>"
+                   data-category="<%= listing.category %>"
+                   data-keywords="<%= listing.keywords ? listing.keywords.join(',').toLowerCase() : '' %>">
+                    <div class="card col">
+                        <img src="<%= listing.image.url %>" class="card-img-top" alt="Listing-image"
+                            style="height: 20rem;">
+
+                        <div class="card-img-overlay"></div>
+
+                        <div class="card-body">
+                            <p class="card-text">
+                                <b>
+                                    <%= listing.title %>
+                                </b> <br>
+                                <small class="text-muted">
+                                    <%= listing.location %>, <%= listing.country %>
+                                </small><br>
+                                &dollar;<%= listing.price.toLocaleString("en-US") %> /night
+                                <i class="tax-info"> &nbsp &nbsp +18% GST </i>
+                            </p>
+                            <% if (listing.category) { %>
+                                <span class="badge bg-secondary"><%= listing.category %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                </a>
+            <% } %>
+        <% } %>
+    </div>
+
+    <script>
+        // Tax toggle functionality
+        const taxSwitch = document.getElementById('flexSwitchCheckDefault');
+        taxSwitch.addEventListener("click", () => {
+            let taxInfo = document.getElementsByClassName('tax-info');
+            for (info of taxInfo) {
+                if (info.style.display != 'inline') {
+                    info.style.display = 'inline';
+                } else {
+                    info.style.display = 'none'
+                }
+            }
+        });
+    </script>
